@@ -992,6 +992,9 @@ command revIDEExtensionLoad pID, pFolder, pVersion, pStatus, pError, pIDEExtensi
    __extensionPropertySet tCacheIndex, "error", tError
    __extensionPropertySet tCacheIndex, "ide", pIDEExtension
    
+   # Check for sample stacks
+   __extensionPropertySet tCacheIndex, "samples", __extensionSampleStacks(pID,pFolder)
+   
    # Store the extension's property metadata
    revIDEExtensionSetInfo pID
    
@@ -1087,6 +1090,22 @@ function __extensionManifestValue pCacheIndex, pProperty
       return tValue
    end if
 end __extensionManifestValue
+
+function __extensionSampleStacks pID, pFolder
+   local tSampleFolder, tSamples, tSampleArray
+   
+   # Get the paths to sample satcks in the bundle
+   put pFolder & slash & "samples" into tSampleFolder
+   if there is a folder tSampleFolder then
+      put files(tSampleFolder) into tSamples
+      filter tSamples without ".*"
+      repeat for each line tStack in tSamples
+         put pFolder & slash & "samples/" & tStack into tSampleArray[tStack] 
+      end repeat
+   end if
+   
+   return tSampleArray
+end __extensionSampleStacks
 
 function __extensionManifestValueFromFile pCacheIndex, pProperty
    # Get the path to the manifest file
